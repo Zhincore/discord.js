@@ -202,11 +202,12 @@ class Client extends BaseClient {
   /**
    * Logs the client in, establishing a websocket connection to Discord.
    * @param {string} [token=this.token] Token of the account to log in with
+   * @param {string|string[]} [sessionID] ID of last session to restore
    * @returns {Promise<string>} Token of the account used
    * @example
-   * client.login('my token');
+   * client.login('my token', 'aaaaaaaaaaaaaaa');
    */
-  async login(token = this.token) {
+  async login(token = this.token, sessionID) {
     if (!token || typeof token !== 'string') throw new Error('TOKEN_INVALID');
     this.token = token = token.replace(/^(Bot|Bearer)\s*/i, '');
     this.emit(
@@ -224,7 +225,7 @@ class Client extends BaseClient {
     this.emit(Events.DEBUG, 'Preparing to connect to the gateway...');
 
     try {
-      await this.ws.connect();
+      await this.ws.connect(sessionID);
       return this.token;
     } catch (error) {
       this.destroy();
